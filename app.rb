@@ -86,6 +86,6 @@ class App < Sinatra::Base
   end
 
   def calculate_average_value(data)
-    (data.map {|d| d.value.to_f }.reduce(:+) / data.size).round(2)
+    data.size > 0 ? (data.map {|d| d.value.to_f }.reduce(:+) / data.size).round(2) : 0
   end
 end
