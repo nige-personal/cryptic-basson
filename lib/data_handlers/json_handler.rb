@@ -25,8 +25,6 @@ class JsonHandler
 
     person_dtos = person_dtos.sort {|x, y| BigDecimal(x.value) <=> BigDecimal(y.value) }.reverse if sort
     person_dtos
-  rescue DataUnavailableError => error
-    raise error
   end
 
   private

@@ -2,7 +2,6 @@
 
 require 'sinatra/base'
 require 'json'
-require 'pry-byebug'
 require 'haversine'
 require 'bigdecimal'
 require_relative 'lib/person_dto'
@@ -11,6 +10,15 @@ require_relative 'lib/exceptions/data_unavailable_error'
 
 # Main entry point for routes
 class App < Sinatra::Base
+  
+  #sanitise user input
+  before do
+    params.each do |p, v|
+      params[p] = Rack::Utils.escape_html(v)
+    end
+  end
+  
+  # display all
   get '/' do
     # set defaults for bristol
     @form_values = {params['calcAvgValue'] => 'off',
@@ -26,6 +34,7 @@ class App < Sinatra::Base
     erb :index
   end
 
+  # filter and calculate average value depending on user input
   post '/' do
     @people_stats = {}
     @form_values = {'lon'          => params['lon'],
