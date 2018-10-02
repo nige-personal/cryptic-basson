@@ -5,8 +5,10 @@ require 'json'
 require 'haversine'
 require 'bigdecimal'
 require_relative 'lib/person_dto'
-require_relative 'lib/data_handlers/json_handler'
+require_relative 'lib/data_handlers/person_json_repository'
 require_relative 'lib/exceptions/data_unavailable_error'
+require_relative 'lib/distance_calculator'
+require_relative 'lib/calculate_request_model'
 
 # Main entry point for routes
 class App < Sinatra::Base
@@ -21,12 +23,13 @@ class App < Sinatra::Base
   # display all
   get '/' do
     # set defaults for bristol
-    @form_values = {params['calcAvgValue'] => 'off',
-                     'lat' => '51.450167', 'lon' => '-2.594678'}
+    @calculate_request_model = CalculateRequestModel.new(lon: '-2.594678',
+                                                         lat: '51.450167',
+                                                         calcAvgValue: 'off')
 
-    json_handler = JsonHandler.new
+    person_json_repository = PersonJsonRepository.new
     begin
-      @people_stats = json_handler.get_person_dtos(true)
+      @people_stats = PersonDto.sort_by_value(person_json_repository.load())
     rescue DataUnavailableError => error
       halt 400, error.message
     end
@@ -37,64 +40,40 @@ class App < Sinatra::Base
   # filter and calculate average value depending on user input
   post '/' do
     @people_stats = {}
-    @form_values = {'lon'          => params['lon'],
-                    'lat'          => params['lat'],
-                    'radius'       => params['radius'],
-                    'unit'         => params['unit'],
-                    'calcAvgValue' => params['calcAvgValue']}
 
-    json_handler = JsonHandler.new
+    @calculate_request_model = CalculateRequestModel.new(lon: params['lon'],
+                                                         lat: params['lat'],
+                                                         radius: params['radius'],
+                                                         unit: params['unit'],
+                                                         calcAvgValue: params['calcAvgValue'])
+
+    person_json_repository = PersonJsonRepository.new
     begin
-      person_dtos = json_handler.get_person_dtos(true)
+      person_dtos = person_json_repository.load()
+      person_dtos = PersonDto.sort_by_value(person_dtos)
     rescue DataUnavailableError => error
       halt 400, error.message
     end
 
-    @people_stats = sorted_data_within_radius(person_dtos, true)
+    @people_stats = persons_within_radius(person_dtos)
 
-    @avg_value = calculate_average_value(@people_stats) if params['calcAvgValue'] == 'on'
+    @avg_value = PersonDto.calculate_average_value(@people_stats) if @calculate_request_model.calcAvgValue == 'on'
     status 200
     erb :index
   end
 
   private
 
-  def within_radius?(lat, lon, radius, distance_unit, person)
-    distance = Haversine.distance(BigDecimal(lat),
-                                  BigDecimal(lon),
-                                  BigDecimal(person.latitude),
-                                  BigDecimal(person.longitude))
-
-    case distance_unit
-    when 'km'
-      distance.to_kilometers <= radius.to_f
-    when 'miles'
-      distance.to_miles <= radius.to_f
-    when 'feet'
-      distance.to_feet <= radius.to_f
-    when 'metres'
-      distance.to_meters <= radius.to_f
-    end
-  end
-
-  def sorted_data_within_radius(person_dtos, filter)
+  def persons_within_radius(person_dtos)
     people_stats = []
 
     person_dtos.each do |person_dto|
-      if filter && within_radius?(params['lat'],
-                                  params['lon'],
-                                  params['radius'],
-                                  params['unit'],
-                                  person_dto) == false
+      if DistanceCalculator.within_radius?(@calculate_request_model, person_dto) == false
         next
       end
 
       people_stats << person_dto
     end
     people_stats
-  end
-
-  def calculate_average_value(data)
-    data.size > 0 ? (data.map {|d| d.value.to_f }.reduce(:+) / data.size).round(2) : 0
   end
 end
