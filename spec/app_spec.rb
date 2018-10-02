@@ -27,7 +27,7 @@ describe App do
       it 'returns status 200 OK' do
         allow(ENV).to receive(:fetch)
           .with('JSON_FILE_LOCATION',
-                JsonHandler::DEFAULT_JSON_FILE_LOCATION).and_return 'myfile/location'
+            PersonJsonRepository::DEFAULT_JSON_FILE_LOCATION).and_return 'myfile/location'
         expect(response.status).to eq 400
       end
     end

@@ -2,7 +2,7 @@
 
 require_relative '../app'
 require_relative '../lib/person_dto'
-require_relative '../lib/data_handlers/json_handler'
+require_relative '../lib/data_handlers/person_json_repository'
 require_relative '../lib/exceptions/data_unavailable_error'
 require 'json'
 require 'bigdecimal'
