@@ -4,20 +4,20 @@
 <div class="form-inline  has-danger">
 <div class="form-group mb-2">
 <label class="sr-only" for="latitude">Latitude</label>
-<input type="text" class="form-control form-control-danger mb-2 mr-sm-2 mb-sm-0" id="latitude"  placeholder="Enter Latitude" aria-describedby="latitudeHelp" name="lat" value="<%= @form_values['lat'] %>" required>
+<input type="text" class="form-control form-control-danger mb-2 mr-sm-2 mb-sm-0" id="latitude"  placeholder="Enter Latitude" aria-describedby="latitudeHelp" name="lat" value="<%= @calculate_request_model.latitude %>" required>
 
 <label class="sr-only" for="longitude">Longitude</label>
-<input type="text" class="form-control form-control-danger mb-2 mr-sm-2 mb-sm-0" id="longitude"  placeholder="Enter Longitude" aria-describedby="longitudeHelp" name="lon" value="<%= @form_values['lon'] %>" required>
+<input type="text" class="form-control form-control-danger mb-2 mr-sm-2 mb-sm-0" id="longitude"  placeholder="Enter Longitude" aria-describedby="longitudeHelp" name="lon" value="<%= @calculate_request_model.longitude %>" required>
 
 <label class="sr-only" for="radius">Distance (kilometres)</label>
-<input type="number" class="form-control form-control-danger mb-2 mr-sm-2 mb-sm-0" id="radius"  placeholder="Enter distance" aria-describedby="kmHelp" name="radius" value="<%= @form_values['radius'] %>" required>
+<input type="number" class="form-control form-control-danger mb-2 mr-sm-2 mb-sm-0" id="radius"  placeholder="Enter distance" aria-describedby="kmHelp" name="radius" value="<%= @calculate_request_model.radius %>" required>
 
 <label class="sr-only" for="distanceMeasures">Unit</label>
   <select class="custom-select mb-2 mr-sm-2 mb-sm-0" id="distanceMeasures" name="unit" required>
-    <option <%= @form_values['unit'] == 'km' ? 'selected' : '' %> value="km">Kilometres</option>
-    <option <%= @form_values['unit'] == 'miles' ? 'selected' : '' %> value="miles">Miles</option>
-    <option <%= @form_values['unit'] == 'feet' ? 'selected' : '' %> value="feet">Feet</option>
-    <option <%= @form_values['unit'] == 'metres' ? 'selected' : '' %> value="metres">Metres</option>
+    <option <%= @calculate_request_model.unit == 'km' ? 'selected' : '' %> value="km">Kilometres</option>
+    <option <%= @calculate_request_model.unit == 'miles' ? 'selected' : '' %> value="miles">Miles</option>
+    <option <%= @calculate_request_model.unit == 'feet' ? 'selected' : '' %> value="feet">Feet</option>
+    <option <%= @calculate_request_model.unit == 'metres' ? 'selected' : '' %> value="metres">Metres</option>
   </select>
 
 
@@ -26,7 +26,7 @@
 </div>
   <div class="form-check form-inline">
   <div class="form-group mb-2">
-    <input type="checkbox" class="form-check-input" id="averageValue" name="calcAvgValue" <%= @form_values['calcAvgValue'] ? 'checked' : '' %>>
+    <input type="checkbox" class="form-check-input" id="averageValue" name="calcAvgValue" <%= @calculate_request_model.calcAvgValue ? 'checked' : '' %>>
     <label class="form-check-label" for="averageValue">Calculate Average Value</label>
     </div>
   </div>
